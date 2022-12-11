@@ -52,16 +52,28 @@ class _HomeState extends State<Home> {
         centerTitle: true,
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FutureBuilder<List<Category>>(
             future: getCategories(),
             builder: (context, snapshot) {
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: snapshot.data == null ? 0 : snapshot.data.length,
+              var item = snapshot.data;
+              return item == null ? Center(
+                  child: CircularProgressIndicator())
+                  : Expanded(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1),
+                  itemCount: item == null ? 0 : item.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(snapshot.data[index].toString()),
+                    return GridTile(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          image: DecorationImage(image: NetworkImage(item[index].image),fit: BoxFit.cover),
+                        ),
+                        child: Text(item[index].title),
+                      ),
                     );
                   },
                 ),
