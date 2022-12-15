@@ -2,13 +2,18 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:news_app/my_provider.dart';
+import 'package:news_app/tab_screen.dart';
+import 'package:provider/provider.dart';
 
 import 'articles_screen.dart';
 import 'category.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => MyProvider(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.light(),
         primaryColor: Colors.deepPurple,
       ),
-      home: Home(),
+      home: TabsScreen(),
     );
   }
 }
@@ -38,12 +43,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Future<List<Category>> getCategories() async {
     final url = Uri.parse("https://api.jsonserve.com/Ryt92T");
-
     var response = await http.get(url);
 
     var jsonString = response.body;
 
     List<Category> categories = categoryFromJson(jsonString);
+
     return categories;
   }
 
@@ -55,13 +60,23 @@ class _HomeState extends State<Home> {
     futureCategory = getCategories();
   }
 
+  //bool isFavorite = false;
+
+  // void toggleFavorite() {
+  //   setState(() {
+  //     if (isFavorite) {
+  //       isFavorite = false;
+  //     } else {
+  //       isFavorite = true;
+  //     }
+  //   });
+  // }
+  late Widget dd;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('News'),
-        centerTitle: true,
-      ),
+    //var obj = Provider.of<MyProvider>(context);
+    return dd = Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -73,18 +88,20 @@ class _HomeState extends State<Home> {
                   ? Center(child: CircularProgressIndicator())
                   : Expanded(
                       child: ListView.builder(
+                        //shrinkWrap: true,
                         itemCount: item.length,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: (){
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => ArticlesScreen(
-                                    articleDesc: item[index].desc,
-                                      articleTitle: item[index].title,
-                                      articleImage: item[index].image,
-                                  )));
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ArticlesScreen(
+                                            article: item[index],
+                                          )));
                             },
                             child: GridTile(
+                              // footer: IconButton(onPressed: toggleFavorite, icon: Icon(Icons.favorite)),
                               child: Container(
                                 height: 200,
                                 padding: EdgeInsets.all(20),
@@ -95,14 +112,33 @@ class _HomeState extends State<Home> {
                                       image: NetworkImage(item[index].image),
                                       fit: BoxFit.cover),
                                 ),
-                                child: Text(
-                                  item[index].title,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      item[index].title,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      iconSize: 40,
+                                      onPressed: () {
+                                        Provider.of<MyProvider>(context,
+                                                listen: false)
+                                            .toggleFavorite(item[index].id);
+                                      },
+                                      icon: (Provider.of<MyProvider>(context)
+                                              .isFavorite(item[index].id)
+                                          ? Icon(Icons.favorite)
+                                          : Icon(Icons.favorite_border)),
+                                      color: Colors.red[500],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'dart:convert';
 
-List<Category> categoryFromJson(jsonString) =>
-    List<Category>.from(json.decode(jsonString).map((item) => Category.fromJson(item)));
+List<Category> categoryFromJson(jsonString) => List<Category>.from(
+    json.decode(jsonString).map((item) => Category.fromJson(item)));
 
 class Category {
   Category({
