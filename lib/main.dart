@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
@@ -46,7 +47,6 @@ class _HomeState extends State<Home> {
     var response = await http.get(url);
 
     var jsonString = response.body;
-
     List<Category> categories = categoryFromJson(jsonString);
 
     return categories;
@@ -60,36 +60,33 @@ class _HomeState extends State<Home> {
     futureCategory = getCategories();
   }
 
-  //bool isFavorite = false;
-
-  // void toggleFavorite() {
-  //   setState(() {
-  //     if (isFavorite) {
-  //       isFavorite = false;
-  //     } else {
-  //       isFavorite = true;
-  //     }
-  //   });
-  // }
-  late Widget dd;
-
   @override
   Widget build(BuildContext context) {
-    //var obj = Provider.of<MyProvider>(context);
-    return dd = Scaffold(
+    List likedId = [];
+    var map = Provider.of<MyProvider>(context, listen: false).map;
+    map.forEach((key, value) {
+      if (value == true) {
+        likedId.add(key);
+      }
+    });
+    // print(map.keys);
+    // print(map.values);
+    // print(likedId);
+
+    return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FutureBuilder<List<Category>>(
             future: futureCategory,
             builder: (context, snapshot) {
-              List<Category>? item = snapshot.data;
-              return item == null
+              List<Category>? items = snapshot.data;
+              return items == null
                   ? Center(child: CircularProgressIndicator())
                   : Expanded(
                       child: ListView.builder(
                         //shrinkWrap: true,
-                        itemCount: item.length,
+                        itemCount: items.length,
                         itemBuilder: (context, index) {
                           return InkWell(
                             onTap: () {
@@ -97,7 +94,7 @@ class _HomeState extends State<Home> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ArticlesScreen(
-                                            article: item[index],
+                                            article: items[index],
                                           )));
                             },
                             child: GridTile(
@@ -109,7 +106,7 @@ class _HomeState extends State<Home> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   image: DecorationImage(
-                                      image: NetworkImage(item[index].image),
+                                      image: NetworkImage(items[index].image),
                                       fit: BoxFit.cover),
                                 ),
                                 child: Column(
@@ -117,7 +114,7 @@ class _HomeState extends State<Home> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      item[index].title,
+                                      items[index].title,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 30,
@@ -130,10 +127,29 @@ class _HomeState extends State<Home> {
                                       onPressed: () {
                                         Provider.of<MyProvider>(context,
                                                 listen: false)
-                                            .toggleFavorite(item[index].id);
+                                            .toggleFavorite(items[index].id);
+                                        var favoriteNews =
+                                            Provider.of<MyProvider>(context,
+                                                    listen: false)
+                                                .favoriteNews;
+
+                                        setState(() {
+                                          favoriteNews.add(items[index]);
+                                          for (var i in likedId) {
+                                            if (items[index].id != likedId[i] || likedId.isEmpty) {
+                                              favoriteNews.add(items[index]);
+                                            }
+                                          }
+
+                                          map.forEach((key, value) {
+                                            if (value == false) {
+                                              favoriteNews.remove(items[index]);
+                                            }
+                                          });
+                                        });
                                       },
                                       icon: (Provider.of<MyProvider>(context)
-                                              .isFavorite(item[index].id)
+                                              .isFavorite(items[index].id)
                                           ? Icon(Icons.favorite)
                                           : Icon(Icons.favorite_border)),
                                       color: Colors.red[500],
