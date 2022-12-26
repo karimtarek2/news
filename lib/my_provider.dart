@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,6 +5,9 @@ import 'category.dart';
 
 class MyProvider with ChangeNotifier {
   final map = Map<int, bool>();
+  List<Category> favoriteNews = [];
+
+  late Future<List<Category>> futureCategory = getCategories();
 
   Future<List<Category>> getCategories() async {
     final url = Uri.parse("https://api.jsonserve.com/Ryt92T");
@@ -19,24 +20,21 @@ class MyProvider with ChangeNotifier {
     return categories;
   }
 
-  late Future<List<Category>> futureCategory = getCategories();
-
   bool isFavorite(int id) {
     return map[id] ?? false;
   }
 
-  MyProvider();
-
-  List<Category> favoriteNews = [];
-
   List<Category> trueKeys = [];
 
+  void toggleFavorite(Category item) {
+    final isFavorite = map[item.id] ?? false;
+    map[item.id] = !isFavorite;
 
-
-  void toggleFavorite(int id) {
-    var isFavorite = map[id] ?? false;
-
-    map[id] = !isFavorite;
+    if (isFavorite) {
+      favoriteNews.remove(item);
+    } else {
+      favoriteNews.add(item);
+    }
 
     notifyListeners();
   }

@@ -36,7 +36,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Provider.of<MyProvider>(context,listen: false).toggleFavorite(widget.article.id);
+          Provider.of<MyProvider>(context,listen: false).toggleFavorite(widget.article);
         },
         foregroundColor: Colors.red[500],
         backgroundColor: Colors.pink[100],
