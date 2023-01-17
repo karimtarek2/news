@@ -47,10 +47,13 @@ class ItemWidget extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: FloatingActionButton(
-              mini: true,
-              elevation: 0,
-              backgroundColor: Colors.white,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white)
+              ),
+              // mini: true,
+              // elevation: 0,
+              // backgroundColor: Colors.white,
               onPressed: () {
                 Provider.of<MyProvider>(context, listen: false).toggleFavorite(item);
               },

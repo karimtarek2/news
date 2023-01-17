@@ -4,7 +4,10 @@ import 'package:http/http.dart' as http;
 import 'category.dart';
 
 class MyProvider with ChangeNotifier {
+  String name = '';
+
   final map = Map<int, bool>();
+  final tagMap = Map<int, String>();
   List<Category> favoriteNews = [];
 
   late Future<List<Category>> futureCategory = getCategories();
@@ -25,6 +28,26 @@ class MyProvider with ChangeNotifier {
   }
 
   List<Category> trueKeys = [];
+
+  void addTagsId(int id, String tags) {
+    tagMap.addAll({id: tags});
+  }
+
+  String tag = '';
+
+  String? tags(int id) {
+    if (tagMap[id] == null) {
+      tagMap[id] = tag;
+    } else {
+      tagMap.forEach((key, value) {
+        if (id == key) {
+          tagMap[id];
+        }
+      });
+    }
+
+    return tagMap[id];
+  }
 
   void toggleFavorite(Category item) {
     final isFavorite = map[item.id] ?? false;
