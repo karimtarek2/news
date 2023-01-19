@@ -8,6 +8,7 @@ class MyProvider with ChangeNotifier {
 
   final map = Map<int, bool>();
   final tagMap = Map<int, String>();
+
   List<Category> favoriteNews = [];
 
   late Future<List<Category>> futureCategory = getCategories();
@@ -29,7 +30,7 @@ class MyProvider with ChangeNotifier {
 
   List<Category> trueKeys = [];
 
-  void addTagsId(int id, String tags) {
+  void addTags(int id, String tags) {
     tagMap.addAll({id: tags});
   }
 

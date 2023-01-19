@@ -21,10 +21,11 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
 
   Future init() async {
     preferences = await SharedPreferences.getInstance();
-    String? reTags = preferences.getString('reTags');
+    String? reTags = preferences.getString(widget.article.id.toString());
     if (reTags == null) return;
-    setState(() => this.reTags = reTags);
-    // print(preferences);
+    setState(() => Provider.of<MyProvider>(context, listen: false)
+        .addTags(widget.article.id, reTags));
+
     print(reTags);
   }
 
@@ -34,12 +35,13 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
   @override
   void initState() {
     super.initState();
-    init();
+
     controller = TextEditingController(
       text: Provider.of<MyProvider>(context, listen: false)
           .tags(widget.article.id)
           .toString(),
     );
+    init();
   }
 
   @override
@@ -50,6 +52,8 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(Provider.of<MyProvider>(context, listen: false).tagMap);
+    // print(Provider.of<MyProvider>(context, listen: false).savedTagMap);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -103,19 +107,11 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        preferences.setString(
-                          "reTags",
-                          Provider.of<MyProvider>(context, listen: false)
-                              .tags(widget.article.id)
-                              .toString(),
-                        );
                         final name = await openDialog();
                         if (name == null || name.isEmpty) return;
                         setState(() =>
-                            // Provider.of<MyProvider>(context, listen: false)
-                            //     .name = name);
                             Provider.of<MyProvider>(context, listen: false)
-                                .addTagsId(widget.article.id, name));
+                                .addTags(widget.article.id, name));
                       },
                       child: const Text('Hash Tag'),
                     ),
@@ -147,8 +143,6 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
               decoration:
                   const InputDecoration(hintText: "Enter your hash tag"),
               controller: controller,
-
-              //onSubmitted: (_) => submit(),
             ),
             actions: [
               TextButton(onPressed: submit, child: const Text('SUBMIT'))
@@ -157,5 +151,8 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
 
   void submit() {
     Navigator.of(context).pop(controller.text);
+    preferences.setString(widget.article.id.toString(), controller.text);
+
+    print(Provider.of<MyProvider>(context, listen: false).tagMap);
   }
 }
